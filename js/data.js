@@ -117,6 +117,7 @@ const DEFAULT_WISHES = [
 const DEFAULT_SETTINGS = {
     luckyMoneyChance: 5,       // 5% tỉ lệ trúng lì xì
     luckyMoneyAmounts: [20000, 50000, 100000],  // Mệnh giá
+    spinLimit: 2,              // Giới hạn lượt lắc (0 = không giới hạn)
     adminPassword: "admin"
 };
 
@@ -187,4 +188,31 @@ function formatMoney(amount) {
 function resetToDefaults() {
     saveWishes(DEFAULT_WISHES);
     saveSettings(DEFAULT_SETTINGS);
+}
+
+// =================== SPIN LIMIT ===================
+
+function getSpinLimit() {
+    const settings = getSettings();
+    return settings.spinLimit || 0;
+}
+
+function getSpinCount() {
+    return parseInt(localStorage.getItem('tetSpinCount') || '0', 10);
+}
+
+function incrementSpinCount() {
+    const count = getSpinCount() + 1;
+    localStorage.setItem('tetSpinCount', count.toString());
+    return count;
+}
+
+function resetSpinCount() {
+    localStorage.setItem('tetSpinCount', '0');
+}
+
+function isSpinLimitReached() {
+    const limit = getSpinLimit();
+    if (limit <= 0) return false; // 0 = unlimited
+    return getSpinCount() >= limit;
 }

@@ -123,6 +123,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function shakeForFortune() {
     if (isShaking) return;
+
+    // Check spin limit
+    if (isSpinLimitReached()) {
+        const limit = getSpinLimit();
+        showToast(`⛔ Bạn đã hết ${limit} lượt lắc rồi!`);
+        const btn = document.getElementById('shakeBtn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⛔ Hết lượt lắc';
+        }
+        return;
+    }
+
     isShaking = true;
 
     const btn = document.getElementById('shakeBtn');
@@ -153,6 +166,7 @@ function shakeForFortune() {
 
         // Record the spin
         recordSpin(wish, luckyMoney);
+        incrementSpinCount();
         updateSpinCounter();
 
         // Show result
@@ -289,8 +303,25 @@ function createConfetti(count) {
 function updateSpinCounter() {
     const stats = getStats();
     const counter = document.getElementById('spinCount');
+    const limit = getSpinLimit();
+    const used = getSpinCount();
+
     if (counter) {
-        counter.textContent = stats.totalSpins;
+        if (limit > 0) {
+            const remaining = Math.max(0, limit - used);
+            counter.textContent = `${used}/${limit}`;
+            // Disable button if limit reached
+            if (remaining <= 0) {
+                const btn = document.getElementById('shakeBtn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = '⛔ Hết lượt lắc';
+                    btn.style.opacity = '0.5';
+                }
+            }
+        } else {
+            counter.textContent = stats.totalSpins;
+        }
     }
 }
 

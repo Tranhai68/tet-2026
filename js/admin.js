@@ -57,6 +57,12 @@ function loadSettings() {
     // Amounts
     currentAmounts = [...(settings.luckyMoneyAmounts || [20000, 50000, 100000])];
     renderAmountTags();
+
+    // Spin limit
+    const spinLimitInput = document.getElementById('spinLimitInput');
+    if (spinLimitInput) {
+        spinLimitInput.value = settings.spinLimit || 0;
+    }
 }
 
 function updateChanceDisplay() {
@@ -110,6 +116,11 @@ function saveSettingsClick() {
     const settings = getSettings();
     settings.luckyMoneyChance = parseInt(document.getElementById('chanceSlider').value);
     settings.luckyMoneyAmounts = [...currentAmounts];
+
+    // Spin limit
+    const spinLimitInput = document.getElementById('spinLimitInput');
+    settings.spinLimit = parseInt(spinLimitInput?.value || '0', 10);
+
     saveSettings(settings);
     showToast('✅ Đã lưu cài đặt!');
 }
