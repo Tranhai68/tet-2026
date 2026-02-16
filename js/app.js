@@ -8,53 +8,83 @@ let lastWishIndex = -1;
 // =================== SHAKE DETECTION ===================
 let lastX = 0, lastY = 0, lastZ = 0;
 let lastShakeTime = 0;
-const SHAKE_THRESHOLD = 15; // Sensitivity (lower = more sensitive)
-const SHAKE_COOLDOWN = 1500; // ms between shakes
+let shakeInitialized = false;
+const SHAKE_THRESHOLD = 12; // Lower = more sensitive
+const SHAKE_COOLDOWN = 2000; // ms between shakes
 
 function initShakeDetection() {
-    if (!('DeviceMotionEvent' in window)) return;
+    // DeviceMotion requires HTTPS on mobile browsers
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 
-    // iOS 13+ requires permission
+    if (!isSecure) {
+        console.log('⚠️ Shake detection requires HTTPS. Use GitHub Pages or localhost.');
+        return;
+    }
+
+    if (!('DeviceMotionEvent' in window)) {
+        console.log('DeviceMotionEvent not supported');
+        return;
+    }
+
+    // iOS 13+ requires user gesture to request permission
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // Add a one-time tap listener to request permission
-        document.body.addEventListener('click', function requestMotion() {
-            DeviceMotionEvent.requestPermission()
-                .then(state => {
-                    if (state === 'granted') {
-                        window.addEventListener('devicemotion', handleMotion);
-                        showToast('📱 Lắc điện thoại để gieo quẻ!');
-                    }
-                })
-                .catch(console.error);
-            document.body.removeEventListener('click', requestMotion);
-        }, { once: true });
+        // Attach to the shake button so first tap requests permission
+        const shakeBtn = document.getElementById('shakeBtn');
+        if (shakeBtn) {
+            shakeBtn.addEventListener('click', requestiOSPermission, { once: true });
+        }
+        // Also allow any touch on the page
+        document.addEventListener('touchend', requestiOSPermission, { once: true });
     } else {
-        // Android & other browsers
-        window.addEventListener('devicemotion', handleMotion);
+        // Android, Chrome, etc — just start listening
+        startListening();
     }
 }
 
+function requestiOSPermission() {
+    if (shakeInitialized) return;
+    DeviceMotionEvent.requestPermission()
+        .then(state => {
+            if (state === 'granted') {
+                startListening();
+                showToast('📱 Đã bật! Lắc điện thoại để gieo quẻ!');
+            } else {
+                showToast('⚠️ Cần cấp quyền cảm biến để lắc!');
+            }
+        })
+        .catch(err => {
+            console.error('Motion permission error:', err);
+        });
+}
+
+function startListening() {
+    if (shakeInitialized) return;
+    shakeInitialized = true;
+    window.addEventListener('devicemotion', handleMotion);
+    console.log('✅ Shake detection active');
+}
+
 function handleMotion(event) {
-    const acc = event.accelerationIncludingGravity;
-    if (!acc) return;
+    // Try acceleration first (without gravity), fallback to includingGravity
+    const acc = event.acceleration || event.accelerationIncludingGravity;
+    if (!acc || acc.x === null) return;
 
     const now = Date.now();
     const deltaX = Math.abs(acc.x - lastX);
     const deltaY = Math.abs(acc.y - lastY);
     const deltaZ = Math.abs(acc.z - lastZ);
+    const totalDelta = deltaX + deltaY + deltaZ;
 
     lastX = acc.x;
     lastY = acc.y;
     lastZ = acc.z;
 
-    // Check if shake is strong enough
-    if ((deltaX + deltaY + deltaZ) > SHAKE_THRESHOLD) {
-        if (now - lastShakeTime > SHAKE_COOLDOWN) {
-            lastShakeTime = now;
-            // Vibrate if supported
-            if (navigator.vibrate) navigator.vibrate(200);
-            shakeForFortune();
-        }
+    // Detect shake
+    if (totalDelta > SHAKE_THRESHOLD && now - lastShakeTime > SHAKE_COOLDOWN) {
+        lastShakeTime = now;
+        // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        shakeForFortune();
     }
 }
 
