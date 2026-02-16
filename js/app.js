@@ -5,9 +5,63 @@
 let isShaking = false;
 let lastWishIndex = -1;
 
+// =================== SHAKE DETECTION ===================
+let lastX = 0, lastY = 0, lastZ = 0;
+let lastShakeTime = 0;
+const SHAKE_THRESHOLD = 15; // Sensitivity (lower = more sensitive)
+const SHAKE_COOLDOWN = 1500; // ms between shakes
+
+function initShakeDetection() {
+    if (!('DeviceMotionEvent' in window)) return;
+
+    // iOS 13+ requires permission
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        // Add a one-time tap listener to request permission
+        document.body.addEventListener('click', function requestMotion() {
+            DeviceMotionEvent.requestPermission()
+                .then(state => {
+                    if (state === 'granted') {
+                        window.addEventListener('devicemotion', handleMotion);
+                        showToast('📱 Lắc điện thoại để gieo quẻ!');
+                    }
+                })
+                .catch(console.error);
+            document.body.removeEventListener('click', requestMotion);
+        }, { once: true });
+    } else {
+        // Android & other browsers
+        window.addEventListener('devicemotion', handleMotion);
+    }
+}
+
+function handleMotion(event) {
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
+
+    const now = Date.now();
+    const deltaX = Math.abs(acc.x - lastX);
+    const deltaY = Math.abs(acc.y - lastY);
+    const deltaZ = Math.abs(acc.z - lastZ);
+
+    lastX = acc.x;
+    lastY = acc.y;
+    lastZ = acc.z;
+
+    // Check if shake is strong enough
+    if ((deltaX + deltaY + deltaZ) > SHAKE_THRESHOLD) {
+        if (now - lastShakeTime > SHAKE_COOLDOWN) {
+            lastShakeTime = now;
+            // Vibrate if supported
+            if (navigator.vibrate) navigator.vibrate(200);
+            shakeForFortune();
+        }
+    }
+}
+
 // =================== INIT ===================
 document.addEventListener('DOMContentLoaded', () => {
     updateSpinCounter();
+    initShakeDetection();
 });
 
 // =================== CORE LOGIC ===================
