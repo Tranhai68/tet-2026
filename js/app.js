@@ -6,83 +6,108 @@ let isShaking = false;
 let lastWishIndex = -1;
 
 // =================== SHAKE DETECTION ===================
-let lastX = 0, lastY = 0, lastZ = 0;
+let lastAccX = 0, lastAccY = 0, lastAccZ = 0;
 let lastShakeTime = 0;
-let shakeInitialized = false;
-const SHAKE_THRESHOLD = 12; // Lower = more sensitive
-const SHAKE_COOLDOWN = 2000; // ms between shakes
+let shakeReady = false;
+let motionSamples = 0;
+const SHAKE_THRESHOLD = 25; // Total acceleration change threshold
+const SHAKE_COOLDOWN = 2000;
 
 function initShakeDetection() {
-    // DeviceMotion requires HTTPS on mobile browsers
+    // Only on mobile / touch devices
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (!isMobile) return;
+
     const isSecure = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-
     if (!isSecure) {
-        console.log('⚠️ Shake detection requires HTTPS. Use GitHub Pages or localhost.');
+        console.log('Shake requires HTTPS');
         return;
     }
 
-    if (!('DeviceMotionEvent' in window)) {
-        console.log('DeviceMotionEvent not supported');
-        return;
-    }
+    if (!('DeviceMotionEvent' in window)) return;
 
-    // iOS 13+ requires user gesture to request permission
+    // Show the enable button on mobile
+    const enableBtn = document.getElementById('enableShakeBtn');
+    if (enableBtn) enableBtn.style.display = 'block';
+}
+
+// Called by the "BẬT LẮC" button
+function enableShake() {
+    const statusEl = document.getElementById('shakeStatus');
+    const enableBtn = document.getElementById('enableShakeBtn');
+
     if (typeof DeviceMotionEvent.requestPermission === 'function') {
-        // Attach to the shake button so first tap requests permission
-        const shakeBtn = document.getElementById('shakeBtn');
-        if (shakeBtn) {
-            shakeBtn.addEventListener('click', requestiOSPermission, { once: true });
-        }
-        // Also allow any touch on the page
-        document.addEventListener('touchend', requestiOSPermission, { once: true });
+        // iOS — must request permission from user gesture
+        DeviceMotionEvent.requestPermission()
+            .then(permission => {
+                if (permission === 'granted') {
+                    activateShake(statusEl, enableBtn);
+                } else {
+                    showToast('❌ Bạn cần cho phép truy cập cảm biến!');
+                    if (statusEl) {
+                        statusEl.style.display = 'inline-block';
+                        statusEl.textContent = '❌ Chưa cấp quyền';
+                        statusEl.style.color = '#ff6b6b';
+                    }
+                }
+            })
+            .catch(err => {
+                showToast('❌ Lỗi: ' + err.message);
+                console.error(err);
+            });
     } else {
-        // Android, Chrome, etc — just start listening
-        startListening();
+        // Android — no permission needed
+        activateShake(statusEl, enableBtn);
     }
 }
 
-function requestiOSPermission() {
-    if (shakeInitialized) return;
-    DeviceMotionEvent.requestPermission()
-        .then(state => {
-            if (state === 'granted') {
-                startListening();
-                showToast('📱 Đã bật! Lắc điện thoại để gieo quẻ!');
-            } else {
-                showToast('⚠️ Cần cấp quyền cảm biến để lắc!');
-            }
-        })
-        .catch(err => {
-            console.error('Motion permission error:', err);
-        });
-}
+function activateShake(statusEl, enableBtn) {
+    window.addEventListener('devicemotion', handleMotion, true);
+    shakeReady = true;
 
-function startListening() {
-    if (shakeInitialized) return;
-    shakeInitialized = true;
-    window.addEventListener('devicemotion', handleMotion);
-    console.log('✅ Shake detection active');
+    if (enableBtn) {
+        enableBtn.textContent = '✅ ĐÃ BẬT LẮC';
+        enableBtn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+        enableBtn.disabled = true;
+    }
+    if (statusEl) {
+        statusEl.style.display = 'inline-block';
+        statusEl.textContent = '📱 Lắc điện thoại để gieo quẻ!';
+        statusEl.style.color = '#2ecc71';
+    }
+    showToast('📱 Đã bật! Lắc mạnh điện thoại để gieo quẻ!');
 }
 
 function handleMotion(event) {
-    // Try acceleration first (without gravity), fallback to includingGravity
-    const acc = event.acceleration || event.accelerationIncludingGravity;
-    if (!acc || acc.x === null) return;
+    if (!shakeReady) return;
 
-    const now = Date.now();
-    const deltaX = Math.abs(acc.x - lastX);
-    const deltaY = Math.abs(acc.y - lastY);
-    const deltaZ = Math.abs(acc.z - lastZ);
+    const acc = event.accelerationIncludingGravity;
+    if (!acc) return;
+
+    const x = acc.x || 0;
+    const y = acc.y || 0;
+    const z = acc.z || 0;
+
+    // Skip the first few samples (calibration)
+    motionSamples++;
+    if (motionSamples < 5) {
+        lastAccX = x; lastAccY = y; lastAccZ = z;
+        return;
+    }
+
+    const deltaX = Math.abs(x - lastAccX);
+    const deltaY = Math.abs(y - lastAccY);
+    const deltaZ = Math.abs(z - lastAccZ);
     const totalDelta = deltaX + deltaY + deltaZ;
 
-    lastX = acc.x;
-    lastY = acc.y;
-    lastZ = acc.z;
+    lastAccX = x;
+    lastAccY = y;
+    lastAccZ = z;
 
     // Detect shake
+    const now = Date.now();
     if (totalDelta > SHAKE_THRESHOLD && now - lastShakeTime > SHAKE_COOLDOWN) {
         lastShakeTime = now;
-        // Haptic feedback
         if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
         shakeForFortune();
     }

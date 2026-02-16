@@ -39,9 +39,13 @@
         📱 Lắc điện thoại hoặc chạm nút bên dưới để gieo quẻ<br>
         Nhận lời chúc Tết may mắn và cơ hội trúng lì xì! 🎊
       </p>
-      <p class="ios-hint" style="font-size: 0.7rem; color: rgba(255,215,0,0.5); margin-top: -8px; margin-bottom: 12px;">
-        🍎 iPhone: Tắt "Lắc để Hoàn tác" trong Cài đặt → Trợ năng → Cảm ứng
-      </p>
+
+      <!-- Shake enable button for mobile -->
+      <button class="enable-shake-btn" id="enableShakeBtn" style="display:none;" onclick="enableShake()">
+        📱 BẬT LẮC ĐIỆN THOẠI
+      </button>
+      <span class="shake-status" id="shakeStatus" style="display:none;"></span>
+
       <button class="shake-btn" id="shakeBtn" onclick="shakeForFortune()">
         🔮 LẮC QUẺ
       </button>
