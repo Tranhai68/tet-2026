@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Admin — Reo Quẻ Tết</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+</head>
+
+<body class="admin-bg">
+
+    <!-- Login Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2>🔐 Đăng nhập Admin</h2>
+            <input type="password" class="form-input" id="loginPassword" placeholder="Nhập mật khẩu..."
+                onkeydown="if(event.key==='Enter') attemptLogin()">
+            <button class="btn btn-primary" onclick="attemptLogin()" style="width:100%; margin-top: 8px;">Đăng
+                nhập</button>
+            <div class="login-error" id="loginError">❌ Sai mật khẩu!</div>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div class="admin-container" id="adminContent" style="display:none;">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1 class="admin-title">⚙️ Quản trị Reo Quẻ Tết</h1>
+            <a href="index.html" class="admin-back-link">← Về trang chính</a>
+        </div>
+
+        <!-- Stats -->
+        <div class="admin-card">
+            <h2>📊 Thống kê</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="statSpins">0</div>
+                    <div class="stat-label">Tổng lượt quay</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statLucky">0</div>
+                    <div class="stat-label">Lần trúng lì xì</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statAmount">0đ</div>
+                    <div class="stat-label">Tổng tiền lì xì</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lucky Money Settings -->
+        <div class="admin-card">
+            <h2>🧧 Cài đặt Lì Xì</h2>
+
+            <div class="form-group">
+                <label class="form-label">Tỉ lệ trúng lì xì</label>
+                <div class="range-container">
+                    <input type="range" class="range-slider" id="chanceSlider" min="0" max="100" value="5"
+                        oninput="updateChanceDisplay()">
+                    <span class="range-value" id="chanceDisplay">5%</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mệnh giá lì xì</label>
+                <div class="amount-tags" id="amountTags"></div>
+                <div class="form-row mt-md">
+                    <div class="form-group" style="margin-bottom:0">
+                        <input type="number" class="form-input" id="newAmountInput" placeholder="Nhập mệnh giá (VNĐ)..."
+                            min="1000" step="1000">
+                    </div>
+                    <button class="btn btn-primary" onclick="addAmount()">+ Thêm</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary mt-md" onclick="saveSettingsClick()">💾 Lưu cài đặt</button>
+        </div>
+
+        <!-- Wish Management -->
+        <div class="admin-card">
+            <h2>📝 Quản lý lời chúc <span style="font-size: 0.8rem; color: #888; font-weight:400" id="wishCount"></span>
+            </h2>
+
+            <!-- Input Mode Toggle -->
+            <div style="display:flex; gap:8px; margin-bottom: 16px;">
+                <button class="btn btn-sm" id="btnModeSingle" onclick="setInputMode('single')"
+                    style="background: var(--gold-500); color: var(--dark);">📝 Thêm từng câu</button>
+                <button class="btn btn-sm btn-outline" id="btnModeBulk" onclick="setInputMode('bulk')">📋 Thêm nhiều
+                    câu</button>
+            </div>
+
+            <!-- Single Mode -->
+            <div class="form-group" id="singleInputMode">
+                <div class="form-row">
+                    <div class="form-group" style="margin-bottom:0">
+                        <input type="text" class="form-input" id="newWishInput" placeholder="Nhập lời chúc mới...">
+                    </div>
+                    <button class="btn btn-primary" onclick="addWish()">+ Thêm</button>
+                </div>
+            </div>
+
+            <!-- Bulk Mode -->
+            <div class="form-group hidden" id="bulkInputMode">
+                <label class="form-label">Mỗi dòng là 1 lời chúc</label>
+                <textarea class="form-textarea" id="bulkWishInput" rows="8"
+                    placeholder="Chúc bạn năm mới vui vẻ!&#10;Chúc mừng năm mới!&#10;An khang thịnh vượng!&#10;..."></textarea>
+                <div style="display:flex; gap:8px; margin-top:12px; align-items:center;">
+                    <button class="btn btn-primary" onclick="addBulkWishes()">+ Thêm tất cả</button>
+                    <span style="font-size:0.8rem; color:#888" id="bulkPreviewCount"></span>
+                </div>
+            </div>
+
+            <ul class="wish-list" id="wishList"></ul>
+        </div>
+
+        <!-- History -->
+        <div class="admin-card">
+            <h2>📜 Lịch sử quay</h2>
+            <div class="history-list" id="historyList">
+                <p style="color:#666; font-size: 0.85rem;">Chưa có lượt quay nào.</p>
+            </div>
+            <button class="btn btn-danger btn-sm mt-md" onclick="clearHistory()">🗑 Xóa lịch sử</button>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="admin-card" style="border-color: rgba(230,57,70,0.2);">
+            <h2 style="color: var(--red-400);">⚠️ Khu vực nguy hiểm</h2>
+            <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <button class="btn btn-danger" onclick="resetAllData()">🔄 Reset toàn bộ (mặc định)</button>
+                <button class="btn btn-outline" onclick="exportData()">📤 Xuất dữ liệu</button>
+                <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 Nhập dữ
+                    liệu</button>
+                <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+            </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="admin-card">
+            <h2>🔑 Đổi mật khẩu</h2>
+            <div class="form-row">
+                <div class="form-group" style="margin-bottom:0">
+                    <input type="password" class="form-input" id="newPasswordInput" placeholder="Mật khẩu mới...">
+                </div>
+                <button class="btn btn-primary" onclick="changePassword()">Đổi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

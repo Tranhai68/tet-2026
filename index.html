@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧧 Tết Bính Ngọ 2026 — Gieo Quẻ Lấy May</title>
+  <meta name="description" content="Lắc quẻ Tết nhận lời chúc may mắn và phong bao lì xì!">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧧</text></svg>">
+</head>
+
+<body class="tet-bg">
+  <!-- Floating decorations -->
+  <div class="floating-decor">🌸</div>
+  <div class="floating-decor">🏮</div>
+  <div class="floating-decor">🎋</div>
+  <div class="floating-decor">✨</div>
+  <div class="floating-decor">🧧</div>
+  <div class="floating-decor">🎆</div>
+
+  <!-- Spin Counter -->
+  <div class="spin-counter" id="spinCounter">
+    🎰 Lượt quay: <span id="spinCount">0</span>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">TẾT BÍNH NGỌ 2026</h1>
+      <p class="app-subtitle">Gieo quẻ lấy may • Nhận lời chúc</p>
+      <span class="year-badge">🐴 BÍNH NGỌ 2026</span>
+    </header>
+
+    <div class="fortune-card" id="fortuneCard">
+      <img src="assets/fortune-sticks.svg" class="fortune-icon-img" alt="Ống xăm" id="fortuneIcon">
+      <p class="fortune-instruction">
+        Chạm vào nút bên dưới để gieo quẻ<br>
+        Nhận lời chúc Tết may mắn và cơ hội trúng lì xì! 🎊
+      </p>
+      <button class="shake-btn" id="shakeBtn" onclick="shakeForFortune()">
+        🔮 LẮC QUẺ
+      </button>
+    </div>
+  </div>
+
+  <!-- Result Modal -->
+  <div class="modal-overlay" id="resultModal">
+    <div class="modal-content">
+      <span class="modal-emoji" id="modalEmoji">🌸</span>
+      <p class="modal-wish" id="modalWish"></p>
+
+      <!-- Lucky Money Section (hidden by default) -->
+      <div class="envelope-section hidden" id="envelopeSection">
+        <div class="envelope-container">
+          <div class="envelope"></div>
+        </div>
+        <div class="lucky-money-amount" id="luckyAmount"></div>
+        <div class="lucky-money-label">🧧 Phong bao lì xì may mắn!</div>
+      </div>
+
+      <button class="modal-close-btn" onclick="closeModal()">Đóng ✨</button>
+    </div>
+  </div>
+
+  <!-- Admin Link -->
+  <a href="admin.html" class="admin-link">⚙️ Quản trị</a>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="woodBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#D4943A"/>
+      <stop offset="40%" stop-color="#C17E28"/>
+      <stop offset="100%" stop-color="#A66B1B"/>
+    </linearGradient>
+    <linearGradient id="woodBand" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="50%" stop-color="#FFA500"/>
+      <stop offset="100%" stop-color="#FFD700"/>
+    </linearGradient>
+    <linearGradient id="stickGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E63946"/>
+      <stop offset="20%" stop-color="#C41E3A"/>
+      <stop offset="30%" stop-color="#DAA520"/>
+      <stop offset="100%" stop-color="#C17E28"/>
+    </linearGradient>
+    <linearGradient id="stickGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="20%" stop-color="#E63946"/>
+      <stop offset="30%" stop-color="#FFD700"/>
+      <stop offset="100%" stop-color="#D4943A"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Container body -->
+  <rect x="65" y="100" width="70" height="70" rx="8" fill="url(#woodBody)" stroke="#8B6914" stroke-width="1.5"/>
+  <rect x="65" y="100" width="70" height="12" rx="4" fill="url(#woodBody)" opacity="0.8"/>
+  
+  <!-- Gold band -->
+  <rect x="63" y="118" width="74" height="14" rx="3" fill="url(#woodBand)" stroke="#B8860B" stroke-width="0.5" filter="url(#glow)"/>
+  <rect x="63" y="123" width="74" height="3" rx="1" fill="rgba(255,255,255,0.3)"/>
+  
+  <!-- Bottom rim -->
+  <rect x="63" y="163" width="74" height="10" rx="5" fill="url(#woodBody)" stroke="#8B6914" stroke-width="1"/>
+  
+  <!-- Fortune sticks -->
+  <rect x="78" y="42" width="5" height="66" rx="2" fill="url(#stickGrad)" transform="rotate(-12, 80, 100)"/>
+  <rect x="86" y="35" width="5" height="72" rx="2" fill="url(#stickGrad2)" transform="rotate(-5, 88, 100)"/>
+  <rect x="95" y="32" width="5" height="74" rx="2" fill="url(#stickGrad)" transform="rotate(0, 97, 100)"/>
+  <rect x="104" y="35" width="5" height="72" rx="2" fill="url(#stickGrad2)" transform="rotate(5, 106, 100)"/>
+  <rect x="113" y="40" width="5" height="68" rx="2" fill="url(#stickGrad)" transform="rotate(10, 115, 100)"/>
+  <rect x="72" y="48" width="5" height="60" rx="2" fill="url(#stickGrad2)" transform="rotate(-18, 74, 100)"/>
+  <rect x="120" y="45" width="5" height="62" rx="2" fill="url(#stickGrad2)" transform="rotate(16, 122, 100)"/>
+  
+  <!-- Decorative plum blossoms -->
+  <g fill="#FFD700" opacity="0.7">
+    <circle cx="40" cy="50" r="4"/><circle cx="36" cy="46" r="3"/><circle cx="44" cy="46" r="3"/><circle cx="37" cy="53" r="3"/><circle cx="43" cy="53" r="3"/>
+    <circle cx="160" cy="60" r="4"/><circle cx="156" cy="56" r="3"/><circle cx="164" cy="56" r="3"/><circle cx="157" cy="63" r="3"/><circle cx="163" cy="63" r="3"/>
+    <circle cx="45" cy="140" r="3.5"/><circle cx="41.5" cy="136.5" r="2.5"/><circle cx="48.5" cy="136.5" r="2.5"/><circle cx="42" cy="143" r="2.5"/><circle cx="48" cy="143" r="2.5"/>
+    <circle cx="155" cy="130" r="3.5"/><circle cx="151.5" cy="126.5" r="2.5"/><circle cx="158.5" cy="126.5" r="2.5"/><circle cx="152" cy="133" r="2.5"/><circle cx="158" cy="133" r="2.5"/>
+    <circle cx="35" cy="90" r="2.5"/><circle cx="32" cy="87" r="2"/><circle cx="38" cy="87" r="2"/><circle cx="32.5" cy="93" r="2"/><circle cx="37.5" cy="93" r="2"/>
+    <circle cx="165" cy="100" r="2.5"/><circle cx="162" cy="97" r="2"/><circle cx="168" cy="97" r="2"/><circle cx="162.5" cy="103" r="2"/><circle cx="167.5" cy="103" r="2"/>
+  </g>
+  
+  <!-- Small dots decoration -->
+  <g fill="#FFD700" opacity="0.4">
+    <circle cx="50" cy="70" r="1.5"/>
+    <circle cx="150" cy="80" r="1.5"/>
+    <circle cx="30" cy="120" r="1"/>
+    <circle cx="170" cy="145" r="1"/>
+    <circle cx="55" cy="160" r="1.5"/>
+    <circle cx="145" cy="155" r="1"/>
+  </g>
+</svg>
